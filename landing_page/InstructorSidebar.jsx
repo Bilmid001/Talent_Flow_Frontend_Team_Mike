@@ -10,40 +10,40 @@ import {
   Headphones,
   Settings,
   LogOut,
+  X,
 } from 'lucide-react';
-import Image from 'next/image';
 
 const navItems = [
-  { label: 'Dashboard',        href: '/instructor/dashboard',   icon: LayoutDashboard },
-  { label: 'Create New Course', href: '/instructor/create-course', icon: PlusCircle },
-  { label: 'My Courses',       href: '/instructor/InstructorMyCourses',  icon: BookOpen },
-  { label: 'Message',          href: '/instructor/InstructorMessage',     icon: MessageCircle,  badge: 3 },
+  { label: 'Dashboard',         href: '/instructor/dashboard',           icon: LayoutDashboard },
+  { label: 'Create New Course', href: '/instructor/createcourse',        icon: PlusCircle },
+  { label: 'My Courses',        href: '/instructor/InstructorMyCourses', icon: BookOpen },
+  { label: 'Message',           href: '/instructor/InstructorMessage',   icon: MessageCircle, badge: 3 },
 ];
 
 const toolItems = [
-  { label: 'Support',  href: '/instructor/support',  icon: Headphones },
+  { label: 'Support',  href: '/instructor/support',            icon: Headphones },
   { label: 'Settings', href: '/instructor/InstructorSettings', icon: Settings },
 ];
 
-export default function InstructorSidebar() {
+export default function InstructorSidebar({ isOpen, onClose }) {
   const pathname = usePathname();
-
   const isActive = (href) => pathname === href;
 
-  return (
-    <aside className="fixed top-0 left-0 h-screen w-56 bg-white border-r border-gray-100 flex flex-col z-50">
-
+  const NavContent = () => (
+    <>
       {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-gray-100">
-        <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center flex-shrink-0">
-          {/* cap icon */}
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-            <path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
-          </svg>
+      <div className="p-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="flex items-center gap-2 justify-center flex-1">
+          <img src="/images/logo.png" alt="Logo" className="w-20 h-auto" />
         </div>
-        <span className="font-extrabold text-gray-900 text-base leading-none">
-          Learn<span className="text-primary">X</span>
-        </span>
+        {/* Close button — mobile only */}
+        <button
+          onClick={onClose}
+          className="lg:hidden p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-all"
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       {/* Main Nav */}
@@ -53,6 +53,7 @@ export default function InstructorSidebar() {
             <li key={href}>
               <Link
                 href={href}
+                onClick={onClose}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isActive(href)
                     ? 'bg-primary text-white'
@@ -62,7 +63,9 @@ export default function InstructorSidebar() {
                 <Icon size={17} className="flex-shrink-0" />
                 <span className="flex-1">{label}</span>
                 {badge && (
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${isActive(href) ? 'bg-white text-primary' : 'bg-primary text-white'}`}>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded-full ${
+                    isActive(href) ? 'bg-white text-primary' : 'bg-primary text-white'
+                  }`}>
                     {badge}
                   </span>
                 )}
@@ -79,6 +82,7 @@ export default function InstructorSidebar() {
               <li key={href}>
                 <Link
                   href={href}
+                  onClick={onClose}
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     isActive(href)
                       ? 'bg-primary text-white'
@@ -104,6 +108,36 @@ export default function InstructorSidebar() {
           Sign-out
         </Link>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── Desktop sidebar (lg+): always visible ── */}
+      <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-gray-100 h-screen fixed left-0 top-0 z-30">
+        <NavContent />
+      </aside>
+
+      {/* ── Mobile / tablet drawer (below lg) ── */}
+      <div className="lg:hidden">
+        {/* Backdrop — fades in when open */}
+        <div
+          onClick={onClose}
+          aria-hidden="true"
+          className={`fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 ${
+            isOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+        />
+
+        {/* Drawer panel — slides in from the left */}
+        <aside
+          className={`fixed top-0 left-0 h-full w-64 max-w-[80vw] bg-white shadow-2xl z-50 flex flex-col
+            transition-transform duration-300 ease-in-out
+            ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        >
+          <NavContent />
+        </aside>
+      </div>
+    </>
   );
 }
