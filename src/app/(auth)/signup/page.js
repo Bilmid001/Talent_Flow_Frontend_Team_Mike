@@ -101,7 +101,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const selectedRole = roles.find(r => r.id === role);
 
-  // UPDATED handleSubmit for step 2 – shows success popup and redirects to signin
+  // handleSubmit – ONLY the success handling has been changed
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -134,9 +134,9 @@ export default function SignUpPage() {
 
       // Check if response has token (successful registration)
       if (response.token && response.user) {
-        // ✅ Show success popup
-        alert('Account created successfully! Please sign in.');
-        // ✅ Redirect to sign-in page
+        // ✅ Show "Sign up successfully" popup
+        alert('Sign up successfully');
+        // ✅ Redirect to sign-in page (for both Instructor and Student)
         router.push('/signin');
       } else if (response.error) {
         setError(response.error);
