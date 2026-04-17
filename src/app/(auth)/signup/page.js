@@ -137,7 +137,7 @@ const handleSubmit = async (e) => {
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
       
-      const redirectPath = role === 'student' ? '/student/dashboard' : '/instructor/dashboard';
+      const redirectPath = role === 'student' ? '/(auth)/signin' : '/(auth)/signin';
       router.push(redirectPath);
     } else if (response.error) {
       setError(response.error);
