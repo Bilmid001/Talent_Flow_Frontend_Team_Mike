@@ -101,56 +101,56 @@ export default function SignUpPage() {
   const router = useRouter();
   const selectedRole = roles.find(r => r.id === role);
 
-  // src/app/(auth)/signup/page.js - Update the handleSubmit for step 2
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (step === 1) {
-    if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match!");
+  // UPDATED handleSubmit for step 2 – shows success popup and redirects to signin
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (step === 1) {
+      if (form.password !== form.confirmPassword) {
+        setError("Passwords do not match!");
+        return;
+      }
+      if (form.password.length < 6) {
+        setError("Password must be at least 6 characters!");
+        return;
+      }
+      setError('');
+      setStep(2);
       return;
     }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters!");
-      return;
-    }
+    
+    // Step 2: Submit registration with security questions
+    setLoading(true);
     setError('');
-    setStep(2);
-    return;
-  }
-  
-  // Step 2: Submit registration with security questions
-  setLoading(true);
-  setError('');
 
-  try {
-    const response = await authService.register(
-      form.fullName,
-      form.email,
-      form.password,
-      role.toUpperCase(),
-      securityAnswers
-    );
+    try {
+      const response = await authService.register(
+        form.fullName,
+        form.email,
+        form.password,
+        role.toUpperCase(),
+        securityAnswers
+      );
 
-    // Check if response has token (successful registration)
-    if (response.token && response.user) {
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-      
-      const redirectPath = role === 'student' ? '/(auth)/signin' : '/(auth)/signin';
-      router.push(redirectPath);
-    } else if (response.error) {
-      setError(response.error);
-    } else {
-      setError('Registration failed. Please try again.');
+      // Check if response has token (successful registration)
+      if (response.token && response.user) {
+        // ✅ Show success popup
+        alert('Account created successfully! Please sign in.');
+        // ✅ Redirect to sign-in page
+        router.push('/signin');
+      } else if (response.error) {
+        setError(response.error);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
+    } catch (err) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Registration error:', err);
-    setError(err.message || 'Registration failed. Please try again.');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
+
   const inputClass = 'w-full px-4 py-3 border border-blue-200 rounded-xl text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all bg-white';
 
   return (
